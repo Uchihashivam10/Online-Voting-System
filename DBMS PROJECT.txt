@@ -1,0 +1,288 @@
+select *from voter
+select *from MP
+select *from Registration
+
+//........TO SEE THE NAME OF PERTY TO WHICH THE VOTER HAVE VOTED...........
+select Registration.Name, Registration.Gender, Registration.Age, voter.Const_name, voter.Voted_to
+from Registration 
+inner join voter on Registration.Voter_id = voter.Voter_id;
+
+//........TO SEE THE NAME OF PERTY AND CANDIDATE NAME TO WHICH THE VOTER HAVE VOTED...........
+select voter.Const_name, voter.Voted_to, Registration.Name, Registration.Gender, Registration.Age, MP.MP_Fname 
+from ((voter 
+inner join Registration on Registration.Voter_id = voter.Voter_id)
+inner join MP on MP.Party_name=voter.Voted_to and MP.MP_Const_id=voter.Const_id );
+
+//.........TO FIND THE WINNER........
+select MAX(Voted_to)  
+from voter  
+
+//.........TO FIND THE 2nd WINNER........
+select MAX(Voted_to)  
+from voter 
+where Voted_to < (select MAX(Voted_to) from voter) 
+
+//.........TO FIND THE LOSER........
+SELECT MIN(Voted_to)  
+FROM voter
+
+//........ SEATS WON BY EACH PARTY........
+select Voted_to, count (*)
+from voter
+group by Voted_to
+
+//.........TO FIND THE NUMBER OF MALE AND FEMALE VOTER......
+select Gender, count (*)
+from Registration
+group by Gender
+
+
+
+//.......TO CHECK THE CANDIDATE ......
+select MP_Const_id, MP_Const_name,
+MP_Fname,
+MP_Age, 
+MP_Gender,
+Party_name,
+MP_District, MP_Pincode,
+Qualification,
+Description 
+from MP
+where MP.MP_Const_id = :MP_Const_id
+
+//..........TO FIND VOTER ID NUMBER .......
+select Aadhar_No, Name, Voter_id
+from voter
+where voter.Aadhar_No = :Aadhar_No
+
+
+//...........TO REGISTER FOR VOTING.....
+create table Registration(Voter_id int primary key,
+Name varchar(20), 
+Age int check (Age>=18), 
+Gender varchar(20) default 'Male',
+District varchar(20), Pincode int not null,
+Aadhar_No int unique)
+
+//...........TO REGISTER AS VOTER ..........
+insert into Registration values(id_gen.nextval,
+:Name, 
+:Age, 
+:Gender,
+:District, :Pincode,
+:Aadhar_No)
+
+drop table Registration
+
+select *from Registration
+
+create table voter(login_id int primary key, Voter_id int,
+Const_id int, Const_name varchar(20),
+Voted_to varchar(5),
+FOREIGN KEY (Voter_id) REFERENCES Registration(Voter_id))
+
+//.............TO VOTE ..............
+insert into voter values(id_generator.nextval,
+:Voter_id,
+:Const_id, :Const_name,
+:Voted_to)
+
+select *from voter
+drop table voter
+
+create sequence id_gen
+start with 1
+increment by 1
+nomaxvalue
+nocycle
+nocache
+
+create sequence id_generator
+start with 1
+increment by 1
+nomaxvalue
+nocycle
+nocache
+
+
+select MP_Const_id, MP_Const_name,
+MP_Fname,
+MP_Age, 
+MP_Gender,
+Party_name,
+MP_District, MP_Pincode,
+Qualification,
+Description, Const_id 
+from MP, voter
+where voter.Const_id = MP.MP_Const_id
+and voter.Const_id  =:Const_id
+
+create table MP(MP_id int primary key,
+MP_Const_id int, MP_Const_name varchar(20),
+MP_Fname varchar(20),
+MP_Age int check(MP_Age>=25), 
+MP_Gender varchar(20) default 'Male',
+Party_name varchar(20),
+MP_District varchar(20), MP_Pincode int not null,
+Qualification varchar(20),
+Description varchar(50))
+
+drop table MP
+
+select *from MP
+
+insert into MP values(1,
+1, 'Purnea',
+'Shivam Yadav',
+27,
+'Male',
+'BJP',
+'Araria', 854328,
+'BA',
+'Working Experience 15 years')
+
+insert into MP values(2,
+1, 'Purnea',
+'Rajiv Yadav',
+34,
+'Male',
+'INC',
+'Araria', 854343,
+'B.Tech',
+'Working Experience 10 years')
+
+insert into MP values(3,
+1, 'Purnea',
+'Ayush Singh',
+38,
+'Male',
+'RJD',
+'Araria', 854328,
+'BBA',
+'Two times  won the election')
+
+insert into MP values(4,
+2, 'Darbhanga',
+'Sunil Sah',
+37,
+'Male',
+'JDU',
+'Samastipur', 854356,
+'Inter paas',
+'Works under MLA for 6 years')
+
+insert into MP values(5,
+2, 'Darbhanga',
+'Sakshi Singh',
+45,
+'Female',
+'RJD',
+'Saharsa', 854376,
+'BA',
+'Won 3 times')
+
+insert into MP values(6,
+2, 'Darbhanga',
+'Arun Sinha',
+39,
+'Male',
+'INC',
+'Siwan', 854379,
+'LLB',
+'Working Experience 10 years under MLA')
+
+insert into MP values(7,
+3, 'Patna', 
+'Rohit Sah', 
+'25', 
+'Male', 
+'INC', 
+'Siwan', '841227', 
+'BTECH', 
+'Working Experience of 3 Years')
+
+insert into MP values(8,
+3, 'Patna', 
+'Rahul Kumar', 
+'30', 
+'Male', 
+'AAP', 
+'Vaishali', '844128', 
+'BCA', 
+'Works under MLA for 5 Years')
+
+insert into MP values(9,
+3, 'Patna', 
+'Ashok Gaur', 
+'45', 
+'Male', 
+'RJD', 
+'Gaya', '823001', 
+'BBA', 
+'Won the Election 3 times')
+
+insert into MP values(10, 
+4, 'Begusarai', 
+'Dilip Das', 
+'33', 
+'Male', 
+'BJP', 
+'Saran', '851101', 
+'BTECH', 
+'Won the previous election')
+
+insert into MP values(11, 
+4, 'Begusarai', 
+'Shobha Kumari', 
+'27', 
+'Female', 
+'INC', 
+'Samastipur', '848101', 
+'BA', 
+'Graduated from JNU University')
+
+insert into MP values(12, 
+4, 'Begusarai', 
+'Kiran Bajpayee', 
+25, 'Female', 
+'AAP', 
+'Bhagalpur', 812001, 
+'BBA', 
+'Works under MLA for 3 years')
+
+UPDATE MP
+SET Party_name='INC',
+WHERE MP_id=2;
+
+
+create table party(party_id int, party_name varchar(20), 
+party_symbol varchar(20),
+party_head varchar(20),
+party_workers int)
+
+insert into party values(1,'BJP',
+'Lotus',
+'JP Nadda',
+600)
+
+insert into party values(2,'INC',
+'Palm',
+'Sonia Gandhi',
+550)
+
+insert into party values(3,'RJD',
+'Laltern',
+'Tejasvi Yadav',
+650)
+
+insert into party values(4,'JDU',
+'Arrow',
+'Nitish Kumar',
+590)
+
+insert into party values(5,'AAP',
+'Broom',
+'Arvind Kejriwal',
+400)
+
+select *from party
